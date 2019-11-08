@@ -1,12 +1,27 @@
+
+sudo: required
 language: java
 
 jdk:
-  - oraclejdk8
+  - openjdk8
 
 script:
-    - mvn test
+  - mvn package -DskipTests
 
-after_script:
-notifications:
-  recipients:
-   - leusonmario@gmail.com
+before_deploy:
+    - mkdir MiningBuild
+    - find . -name '*.jar' -exec cp {} ./MiningBuild \;
+    - cd /home/travis/build/build-test-conflicts/javaToy/MiningBuild
+    - tar -zcvf result.tar.gz *
+deploy:
+  provider: releases
+  api_key:
+    secure: $GITHUB_TOKEN
+  file: result.tar.gz
+  name: fetchjar-10dd823e8b7142acafeed17d1f0a832c7eafca78
+  file_glob: true
+  overwrite: true
+  skip_cleanup: true
+  on:
+    all_branches: true 
+            
